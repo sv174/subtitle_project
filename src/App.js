@@ -1,11 +1,11 @@
 import React from 'react';
-import MobileApp from './Mobile';
-import DesktopApp from './Desktop';
+import Workspace from './Workspace';
 
+// Workspace is fully responsive (CSS Grid + media queries), so the
+// old isMobile-based branch between separate Desktop/Mobile components
+// is no longer needed — one component, one source of truth.
 const App = () => {
-  const isMobile = window.innerWidth <= 768; // You can adjust the breakpoint as needed
-
-  return isMobile ? <MobileApp /> : <DesktopApp />;
+  return <Workspace />;
 };
 
 export default App;

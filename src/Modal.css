@@ -1,0 +1,130 @@
+/* ============================================================
+   Modal.css — shared dialog shell, matches Workspace.css tokens
+   ============================================================ */
+
+.ws-modal-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(6, 8, 11, 0.65);
+  backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: ws-fade-in .12s ease;
+}
+
+.ws-modal{
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 40px);
+  background: var(--panel, #12161b);
+  border: 1px solid var(--border, #262e38);
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: ws-rise-in .14s ease;
+}
+.ws-modal.wide{ max-width: 620px; }
+
+.ws-modal-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-soft, #1c222a);
+  flex: none;
+}
+.ws-modal-header h2{
+  font-size: 14.5px; font-weight: 600; margin: 0;
+  color: var(--text, #dde2e7);
+  letter-spacing: -0.01em;
+}
+.ws-modal-header .tone-danger{ color: #ff8b88; }
+
+.ws-modal-close{
+  width: 26px; height: 26px;
+  display:flex; align-items:center; justify-content:center;
+  background: transparent; border: 1px solid transparent; border-radius: 4px;
+  color: var(--text-muted, #6b7684); cursor: pointer; font-size: 15px; line-height:1;
+}
+.ws-modal-close:hover{ background: var(--s-800, #1c222a); color: var(--text, #dde2e7); }
+
+.ws-modal-body{
+  padding: 18px; overflow-y: auto; flex: 1 1 auto;
+  font-size: 13.5px; color: var(--text, #dde2e7); line-height: 1.55;
+}
+.ws-modal-body p{ margin: 0 0 12px; }
+.ws-modal-body p:last-child{ margin-bottom: 0; }
+
+.ws-modal-footer{
+  display:flex; justify-content:flex-end; gap: 8px;
+  padding: 12px 18px; border-top: 1px solid var(--border-soft, #1c222a);
+  flex: none;
+}
+
+/* Form primitives reused across modals */
+.ws-form-group{ display:flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.ws-form-group:last-child{ margin-bottom: 0; }
+.ws-form-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.ws-form-group label{
+  font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--text-dim, #4a5563);
+}
+.ws-form-hint{ font-size: 12px; color: var(--text-muted, #6b7684); margin-top: 4px; }
+.ws-form-error{
+  font-size: 12.5px; color: #ff8b88;
+  background: rgba(239, 83, 80, 0.1);
+  border: 1px solid var(--danger-dim, #7a2b29);
+  border-radius: 4px; padding: 8px 10px; margin-top: 4px;
+}
+.ws-form-note{
+  font-size: 12px; color: var(--warn, #f0b429);
+  background: rgba(240, 180, 41, 0.08);
+  border: 1px solid rgba(240, 180, 41, 0.3);
+  border-radius: 4px; padding: 10px 12px; margin-top: 12px;
+}
+.ws-form-note ul{ margin: 6px 0 0; padding-left: 18px; }
+.ws-form-note li{ margin-bottom: 2px; }
+
+/* Error / results list (Errorchecking) */
+.ws-issue-list{ list-style: none; margin: 0; padding: 0; display:flex; flex-direction:column; gap: 10px; }
+.ws-issue{
+  border: 1px solid var(--border-soft, #1c222a);
+  border-left: 3px solid var(--danger, #ef5350);
+  border-radius: 4px; padding: 10px 12px; background: var(--s-850, #171c22);
+}
+.ws-issue .type{ font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #ff8b88; font-weight: 600; }
+.ws-issue .msg{ font-size: 13px; margin: 4px 0 8px; color: var(--text, #dde2e7); }
+.ws-issue .subs{ list-style: none; margin: 0; padding: 0; display:flex; flex-direction: column; gap: 3px; }
+.ws-issue .subs li{
+  font-family: var(--mono, monospace); font-size: 11.5px; color: var(--text-muted, #6b7684);
+}
+.ws-empty-state{
+  text-align: center; padding: 24px 10px; color: var(--text-muted, #6b7684); font-size: 13px;
+}
+
+/* File-picker row used by Import */
+.ws-file-drop{
+  border: 1px dashed var(--border, #262e38);
+  border-radius: 5px; padding: 18px; text-align: center;
+  background: var(--s-850, #171c22);
+}
+.ws-file-drop input[type="file"]{
+  color: var(--text-muted, #6b7684); font-size: 12.5px; width: 100%;
+}
+.ws-file-drop .picked{
+  margin-top: 8px; font-family: var(--mono, monospace); font-size: 12px; color: var(--accent, #4d8dff);
+}
+
+.ws-btn.danger-solid{ background: var(--danger, #ef5350); border-color: var(--danger, #ef5350); color: #fff; }
+.ws-btn.danger-solid:hover{ background:#e0403c; }
+
+@keyframes ws-fade-in{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes ws-rise-in{ from{ opacity:0; transform: translateY(6px) scale(.98); } to{ opacity:1; transform:none; } }
+
+@media (prefers-reduced-motion: reduce){
+  .ws-modal-backdrop, .ws-modal{ animation: none; }
+}
+
+@media (max-width: 520px){
+  .ws-form-row{ grid-template-columns: 1fr; gap: 0; }
+  .ws-modal{ max-width: 100%; }
+}

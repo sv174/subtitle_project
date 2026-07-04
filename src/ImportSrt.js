@@ -1,104 +1,91 @@
-import React,{useState} from 'react'
-import srtParser2 from "srt-parser-2";
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useState } from 'react';
+import srtParser2 from 'srt-parser-2';
+import WsModal from './Modal';
 
+function ImportSrt({ setEntries, SetDivs, setIndex }) {
+  const [srtfile, setSrtFile] = useState('');
+  const [show, setShow] = useState(false);
+  const [error, setError] = useState('');
 
-function ImportSrt({setEntries, SetDivs, setIndex}) {
-    const [srtfile,setSrtFile]=useState('')
+  const handleCloseExportModal = () => {
+    setShow(false);
+    setSrtFile('');
+    setError('');
+  };
 
-    
-    const[show,setShow]=useState(false)
+  const ShowDialog = () => setShow(true);
 
-    const handleCloseExportModal = () => {
-      setShow(false);
-    };
-  
-    const ShowDialog=()=>
-    {
-        setShow(true)
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSrtFile(file);
+      setError('');
     }
-      
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        setSrtFile(file);
-      }
-    };
+  };
 
-    const handleSrtSelection=()=>
-    {
-      const SrtURL =srtfile
-      console.log(SrtURL)
-      setSrtFile(SrtURL)
-      const reader = new FileReader();
+  const handleSrtSelection = () => {
+    if (!srtfile) {
+      setError('Choose an .srt file first.');
+      return;
+    }
 
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const srtFileContent = e.target.result;
+      const parser = new srtParser2();
+      const srt_array = parser.fromSrt(srtFileContent);
 
-      reader.onload = (e) => {
-        const srtFileContent = e.target.result;
-        var parser = new srtParser2();
-        var srt_array = parser.fromSrt(srtFileContent);
-      console.log(srt_array)
-      
-      const formattedArray = srt_array.map((entry, index) => {
-        // Check if the necessary properties exist in the entry
-        if (entry && entry.startTime && entry.endTime && entry.text) {
+      const formattedArray = srt_array
+        .map((entry, index) => {
+          if (entry && entry.startTime && entry.endTime && entry.text) {
             return {
-                id: (index + 1).toString(), // Assign a unique ID
-                startTime: entry.startTime,
-                endTime: entry.endTime,
-                Text: entry.text, // Assuming the text is under the 'text' key in parsed SRT
+              id: (index + 1).toString(),
+              startTime: entry.startTime,
+              endTime: entry.endTime,
+              Text: entry.text,
             };
-        } });
+          }
+          return null;
+        })
+        .filter(Boolean);
 
-    console.log(formattedArray)
-    setEntries(formattedArray);
-     setIndex(+formattedArray.length+1)
-     const divArray = Array.from({ length: +srt_array.length }, (_, index) => index + 1);
-     SetDivs(divArray)
-     console.log(divArray)
-     handleCloseExportModal()
+      if (formattedArray.length === 0) {
+        setError('No valid cues found in that file. Check the .srt format and try again.');
+        return;
       }
-      reader.readAsText(srtfile);
-    }
- 
-  return (
-    // <input 
-    //     type="file" 
-    //     accept="text/*" 
-    //     onChange={handleSrtSelection} 
-    //     style={{ marginBottom: '20px' }} 
-    //   />
-<div>
-  <button className='btn btn-primary' onClick={ShowDialog}>Import SRT </button>
-    <Modal show={show} onHide={handleCloseExportModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Import SRT File</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group controlId="formFileName">
-            <Form.Label>File Name</Form.Label>
-            <input
-        type="file"
-        accept=".srt" // Ensure that only .srt files can be selected
-        onChange={handleFileChange}
-        style={{ marginBottom: '20px' }}
-      />
 
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleCloseExportModal}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleSrtSelection}>
-          Import
-        </Button>
-      </Modal.Footer>
-    </Modal>
-    </div>
-  )
+      setEntries(formattedArray);
+      setIndex(formattedArray.length + 1);
+      const divArray = Array.from({ length: formattedArray.length }, (_, index) => index + 1);
+      SetDivs(divArray);
+      handleCloseExportModal();
+    };
+    reader.readAsText(srtfile);
+  };
+
+  return (
+    <>
+      <button className="ws-btn" onClick={ShowDialog}>Import SRT</button>
+
+      <WsModal show={show} onClose={handleCloseExportModal} title="Import SRT file">
+        <WsModal.Body>
+          <div className="ws-form-group">
+            <label>SRT file</label>
+            <div className="ws-file-drop">
+              <input type="file" accept=".srt" onChange={handleFileChange} />
+              {srtfile && <div className="picked">{srtfile.name}</div>}
+            </div>
+          </div>
+          {error && <div className="ws-form-error">{error}</div>}
+          <div className="ws-form-hint">This replaces the current timeline. Export your work first if you want to keep it.</div>
+        </WsModal.Body>
+        <WsModal.Footer>
+          <button className="ws-btn" onClick={handleCloseExportModal}>Cancel</button>
+          <button className="ws-btn primary" onClick={handleSrtSelection}>Import</button>
+        </WsModal.Footer>
+      </WsModal>
+    </>
+  );
 }
 
-export default ImportSrt
+export default ImportSrt;

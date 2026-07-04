@@ -1,24 +1,17 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import WsModal from './Modal';
 
 function DeleteEntry({ handleClose, handleDelete, showDelete }) {
   return (
-    <Modal show={showDelete} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Confirm Deletion</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        Are you sure you want to delete this entry?
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button variant="danger" onClick={handleDelete}>
-          Delete
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <WsModal show={showDelete} onClose={handleClose} title="Delete cue" tone="danger">
+      <WsModal.Body>
+        <p>Are you sure you want to delete this cue? This can't be undone.</p>
+      </WsModal.Body>
+      <WsModal.Footer>
+        <button className="ws-btn" onClick={handleClose}>Cancel</button>
+        <button className="ws-btn danger-solid" onClick={handleDelete}>Delete</button>
+      </WsModal.Footer>
+    </WsModal>
   );
 }
 

@@ -1,23 +1,31 @@
 /* LoadingModal.css */
 .loading-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(6, 8, 11, 0.65);
+    backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensure it's on top of other content */
+    z-index: 1000;
 }
 
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
+.loading-modal .modal-content {
+    background: var(--panel, #12161b);
+    border: 1px solid var(--border, #262e38);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    padding: 24px 28px;
+    border-radius: 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 12px;
+}
+
+.loading-modal .modal-content p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted, #6b7684);
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
 }

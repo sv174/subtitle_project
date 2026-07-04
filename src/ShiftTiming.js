@@ -1,152 +1,119 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import WsModal from './Modal';
 
+function ShiftTiming({ Entries, setEntries, formatDuration }) {
+  const [startSeconds, setStartSeconds] = useState(0);
+  const [startMilliseconds, setStartMilliseconds] = useState(0);
+  const [endSeconds, setEndSeconds] = useState(0);
+  const [endMilliseconds, setEndMilliseconds] = useState(0);
+  const [show, setShow] = useState(false);
 
-function ShiftTiming({Entries, setEntries, formatDuration}) {
-    const [startSeconds, setStartSeconds] = useState(0);
-    const [startMilliseconds, setStartMilliseconds] = useState(0);
-    const [endSeconds, setEndSeconds] = useState(0);
-    const [endMilliseconds, setEndMilliseconds] = useState(0);
-    const[show,setShow]=useState(false)
+  const handleClose = () => setShow(false);
+  const showDialog = () => setShow(true);
 
-    const handleClose = () => {
-        setShow(false);
+  function convertToSeconds(timeStr) {
+    const [time, ms] = timeStr.split(',');
+    const [hours, minutes, seconds] = time.split(':');
+    return (
+      parseInt(hours, 10) * 3600 +
+      parseInt(minutes, 10) * 60 +
+      parseFloat(seconds) +
+      parseInt(ms, 10) / 1000
+    );
+  }
+
+  const handleShift = () => {
+    const updatedEntries = Entries.map((entry) => {
+      const currentStart = convertToSeconds(entry.startTime);
+      const currentEnd = convertToSeconds(entry.endTime);
+
+      let totalSecondsStart = +startSeconds + startMilliseconds / 1000;
+      let totalSecondsEnd = +endSeconds + endMilliseconds / 1000;
+
+      totalSecondsStart = startSeconds < 0
+        ? currentStart - Math.abs(totalSecondsStart)
+        : currentStart + totalSecondsStart;
+
+      totalSecondsEnd = endSeconds < 0
+        ? currentEnd - Math.abs(totalSecondsEnd)
+        : currentEnd + totalSecondsEnd;
+
+      return {
+        ...entry,
+        startTime: formatDuration(totalSecondsStart),
+        endTime: formatDuration(totalSecondsEnd),
       };
+    });
 
-      const showDialog = ()=>{
-        setShow(true);
-      }
+    setEntries(updatedEntries);
+    handleClose();
+  };
 
-      function convertToSeconds(timeStr) {
-        // Split the time string into hours, minutes, seconds, and milliseconds
-        const [time, ms] = timeStr.split(',');  // Split by the comma
-        const [hours, minutes, seconds] = time.split(':');  // Split by the colon
-    
-        // Convert to seconds
-        const totalSeconds = 
-            (parseInt(hours, 10) * 3600) +   // Convert hours to seconds
-            (parseInt(minutes, 10) * 60) +   // Convert minutes to seconds
-            parseFloat(seconds) +            // Add seconds
-            (parseInt(ms, 10) / 1000);       // Add the fractional part from milliseconds
-    
-        return totalSeconds;
-    }
-      
-
-    const handleShift = () => {
-        let updatedEntries = Entries.map((entry) => {
-            // Convert current start and end times to seconds
-            let currentStart = convertToSeconds(entry.startTime);
-            let currentEnd = convertToSeconds(entry.endTime);
-    
-            // Calculate the shift time in seconds (including milliseconds as fractional seconds)
-            let totalSecondsStart = +startSeconds + (startMilliseconds / 1000);
-            let totalSecondsEnd = +endSeconds + (endMilliseconds / 1000);
-    
-            // Adjust start time based on whether the shift is negative or positive
-            if (startSeconds < 0) {
-                totalSecondsStart = currentStart - Math.abs(totalSecondsStart);
-            } else {
-                totalSecondsStart = currentStart + totalSecondsStart;
-            }
-    
-            // Adjust end time based on whether the shift is negative or positive
-            if (endSeconds < 0) {
-                totalSecondsEnd = currentEnd - Math.abs(totalSecondsEnd);
-            } else {
-                totalSecondsEnd = currentEnd + totalSecondsEnd;
-            }
-    
-            // Return updated entry with formatted time
-            return {
-                ...entry,
-                startTime: formatDuration(totalSecondsStart), // Convert back to hh:mm:ss,sss
-                endTime: formatDuration(totalSecondsEnd)      // Convert back to hh:mm:ss,sss
-            };
-        });
-    
-        // Set the updated entries
-        setEntries(updatedEntries);
-        handleClose()
-    };
-    
-
-    
+  const noChange = !+startSeconds && !+startMilliseconds && !+endSeconds && !+endMilliseconds;
 
   return (
-    <div><button className='btn btn-danger' onClick={showDialog}>ShiftTiming</button>
-    
+    <>
+      <button className="ws-btn" onClick={showDialog}>Shift timing</button>
 
-    <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Shift Timings of all entries</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form>
-                    <Form.Group>
-                        <Form.Label>Start Time</Form.Label>
-                        <Row>
-                            <Col>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Seconds"
-                                    value={startSeconds}
-                                    onChange={(e) => setStartSeconds(e.target.value)}
-                                />
-                            </Col>
-                            <Col>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Milliseconds"
-                                    value={startMilliseconds}
-                                    onChange={(e) => setStartMilliseconds(e.target.value)}
-                                />
-                            </Col>
-                        </Row>
-                    </Form.Group>
+      <WsModal show={show} onClose={handleClose} title="Shift timing of all cues">
+        <WsModal.Body>
+          <div className="ws-form-group">
+            <label>Start time offset</label>
+            <div className="ws-form-row" style={{ marginBottom: 0 }}>
+              <input
+                type="number"
+                className="ws-input"
+                placeholder="Seconds"
+                value={startSeconds}
+                onChange={(e) => setStartSeconds(e.target.value)}
+              />
+              <input
+                type="number"
+                className="ws-input"
+                placeholder="Milliseconds"
+                value={startMilliseconds}
+                onChange={(e) => setStartMilliseconds(e.target.value)}
+              />
+            </div>
+          </div>
 
-                    <Form.Group className="mt-3">
-                        <Form.Label>End Time</Form.Label>
-                        <Row>
-                            <Col>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Seconds"
-                                    value={endSeconds}
-                                    onChange={(e) => setEndSeconds(e.target.value)}
-                                />
-                            </Col>
-                            <Col>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Milliseconds"
-                                    value={endMilliseconds}
-                                    onChange={(e) => setEndMilliseconds(e.target.value)}
-                                />
-                            </Col>
-                        </Row>
-                    </Form.Group>
-                    <label style={{color:'red'}}>
-                    Note: Use this feature to adjust the start and end times of all entries.
-            <li>
-                Enter a positive value to add time or a negative value to subtract time.
-                </li>  <li>Set the value to 0 if no changes are required.</li> 
-                 
-                    </label>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={handleShift}>
-                    Shift
-                </Button>
-            </Modal.Footer>
-        </Modal>
-    
-    </div>
-  )
+          <div className="ws-form-group">
+            <label>End time offset</label>
+            <div className="ws-form-row" style={{ marginBottom: 0 }}>
+              <input
+                type="number"
+                className="ws-input"
+                placeholder="Seconds"
+                value={endSeconds}
+                onChange={(e) => setEndSeconds(e.target.value)}
+              />
+              <input
+                type="number"
+                className="ws-input"
+                placeholder="Milliseconds"
+                value={endMilliseconds}
+                onChange={(e) => setEndMilliseconds(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="ws-form-note">
+            This shifts every cue in the timeline, not just the selected one.
+            <ul>
+              <li>Positive values push times later; negative values pull them earlier.</li>
+              <li>Leave a field at 0 to leave that edge unchanged.</li>
+            </ul>
+          </div>
+        </WsModal.Body>
+        <WsModal.Footer>
+          <button className="ws-btn" onClick={handleClose}>Cancel</button>
+          <button className="ws-btn primary" onClick={handleShift} disabled={noChange}>
+            Shift {Entries.length} cue{Entries.length === 1 ? '' : 's'}
+          </button>
+        </WsModal.Footer>
+      </WsModal>
+    </>
+  );
 }
 
-export default ShiftTiming
+export default ShiftTiming;

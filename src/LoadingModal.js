@@ -1,19 +1,19 @@
 // LoadingModal.jsx
 import React from 'react';
-import './LoadingModal.css'; // Import the CSS file for styling
-import LoadingSpinner from './LoadingSpinner'; // Reuse the spinner component
+import './LoadingModal.css';
+import LoadingSpinner from './LoadingSpinner';
 
 const LoadingModal = ({ isOpen }) => {
-    if (!isOpen) return null; // Don't render anything if not open
+  if (!isOpen) return null;
 
-    return (
-        <div className="loading-modal">
-            <div className="modal-content">
-                <LoadingSpinner />
-                <p>Processing...</p>
-            </div>
-        </div>
-    );
+  return (
+    <div className="loading-modal">
+      <div className="modal-content">
+        <LoadingSpinner />
+        <p>Processing…</p>
+      </div>
+    </div>
+  );
 };
 
 export default LoadingModal;

@@ -1,46 +1,35 @@
-// ExportModal.js
 import React, { useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import WsModal from './Modal';
 
-function ExportDialog({ show, saveSrtFile, convertToSrt, Entries, setShow }) {
+function ExportDialog({ show, saveSrtFile, Entries, setShow }) {
   const [fileName, setFileName] = useState('');
 
-  const handleFileNameChange = (e) => {
-    setFileName(e.target.value);
-  };
+  const handleCloseExportModal = () => setShow(false);
 
-  const handleCloseExportModal = () => {
-    setShow(false);
+  const handleExport = () => {
+    saveSrtFile(Entries, fileName || 'subtitles');
+    handleCloseExportModal();
   };
-
 
   return (
-    <Modal show={show} onHide={handleCloseExportModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Export SRT File</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group controlId="formFileName">
-            <Form.Label>File Name</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter file name"
-              value={fileName}
-              onChange={handleFileNameChange}
-            />
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleCloseExportModal}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={()=>saveSrtFile(Entries, fileName)}>
-          Export
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <WsModal show={show} onClose={handleCloseExportModal} title="Export SRT file">
+      <WsModal.Body>
+        <div className="ws-form-group">
+          <label>File name</label>
+          <input
+            className="ws-input"
+            placeholder="subtitles"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+          />
+          <div className="ws-form-hint">Saved as {fileName || 'subtitles'}.srt — {Entries.length} cue{Entries.length === 1 ? '' : 's'}.</div>
+        </div>
+      </WsModal.Body>
+      <WsModal.Footer>
+        <button className="ws-btn" onClick={handleCloseExportModal}>Cancel</button>
+        <button className="ws-btn primary" onClick={handleExport}>Export</button>
+      </WsModal.Footer>
+    </WsModal>
   );
 }
 
